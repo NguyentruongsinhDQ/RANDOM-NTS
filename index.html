@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Công cụ Chọn Ngẫu nhiên Cao cấp V6.14</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;500;800;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent-blue: #00e5ff;
+            --accent-pink: #ff00ff;
+            --accent-gold: #FFD700;
+            --bg-deep: #050a1b;
+            --royal-blue: #002299;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: #fff;
+            font-family: 'Exo 2', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            transition: background 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .bg-glow {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 50%, #001144 0%, #050a1b 100%);
+            z-index: -1;
+        }
+        .bg-grid {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+        }
+
+        /* --- STUDIO MODE --- */
+        #view-config {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .studio-panel {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(10, 15, 30, 0.8);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .studio-panel::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-pink));
+        }
+
+        .studio-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: 4px;
+            margin-bottom: 30px;
+            text-align: center;
+            background: linear-gradient(to right, #fff, var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .custom-select {
+            flex: 1;
+            min-width: 250px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--glass-border);
+            color: var(--accent-blue);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            outline: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .custom-select:hover { border-color: var(--accent-blue); }
+
+        .btn-studio {
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-studio:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-blue { color: var(--accent-blue); border-color: var(--accent-blue); }
+        .btn-blue:hover { background: var(--accent-blue); color: #000; }
+        .btn-magenta { color: var(--accent-pink); border-color: var(--accent-pink); }
+        .btn-magenta:hover { background: var(--accent-pink); color: #fff; }
+        .btn-gold { color: var(--accent-gold); border-color: var(--accent-gold); }
+        .btn-gold:hover { background: var(--accent-gold); color: #000; }
+
+        .editor-area {
+            width: 100%;
+            height: 220px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 20px;
+            color: #ddd;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: none;
+            margin-bottom: 25px;
+            transition: 0.3s;
+        }
+        .editor-area:focus {
+            border-color: var(--accent-blue);
+            background: rgba(0,0,0,0.5);
+            outline: none;
+        }
+
+        .footer-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #556080;
+            font-size: 0.85rem;
+            margin-bottom: 25px;
+        }
+
+        .btn-launch {
+            width: 100%;
+            padding: 22px;
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #0044ff, #002299);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            box-shadow: 0 10px 30px rgba(0, 34, 153, 0.4);
+            transition: 0.4s;
+        }
+        .btn-launch:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 34, 153, 0.6);
+            filter: brightness(1.2);
+        }
+
+        /* --- PICKER MODE --- */
+        #view-picker {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: var(--royal-blue);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            background: radial-gradient(circle at center, #002299 0%, #001144 100%);
+        }
+
+        #result-name {
+            font-size: 8rem;
+            font-weight: 900;
+            text-align: center;
+            width: 100%;
+            padding: 40px;
+            line-height: 1.1;
+            word-wrap: break-word;
+            text-transform: uppercase;
+            color: #fff;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .picker-hud {
+            position: absolute;
+            bottom: 60px;
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .btn-random {
+            background: #FFFFFF;
+            color: var(--royal-blue);
+            font-family: 'Exo 2', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 900;
+            padding: 20px 80px;
+            border: none;
+            border-radius: 100px;
+            cursor: pointer;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+        .btn-random:hover {
+            transform: scale(1.1) translateY(-5px);
+            background: #f0f0f0;
+        }
+        .btn-random:active { transform: scale(0.95); }
+
+        .btn-util {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            padding: 15px 35px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 100px;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            transition: 0.3s;
+        }
+        .btn-util:hover { background: rgba(255,255,255,0.2); border-color: #fff; }
+
+        .btn-exit {
+            position: absolute;
+            top: 40px; left: 40px;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.9rem;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s;
+        }
+        .btn-exit:hover { color: #fff; }
+
+        /* WINNER EFFECT */
+        .winner-active {
+            color: var(--accent-gold) !important;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.5), 0 0 60px rgba(255, 215, 0, 0.2) !important;
+            animation: winnerGlow 0.5s infinite alternate;
+        }
+
+        @keyframes winnerGlow {
+            from { transform: scale(1); }
+            to { transform: scale(1.03); }
+        }
+
+        .author-credit {
+            position: fixed;
+            bottom: 15px;
+            right: 20px;
+            font-family: 'Exo 2', sans-serif;
+            font-size: 0.8rem;
+            color: var(--accent-gold);
+            opacity: 0.8;
+            z-index: 200;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            pointer-events: none;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* MODAL */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 5, 15, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+            align-items: center; justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-box {
+            background: #0a0f1d;
+            border: 1px solid var(--accent-blue);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(0, 229, 255, 0.1);
+        }
+
+        .modal-title {
+            color: var(--accent-blue);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+        }
+
+        .modal-btns {
+            display: flex; gap: 12px; justify-content: center; margin-top: 30px;
+        }
+
+        .m-btn {
+            padding: 14px 28px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: 'Exo 2';
+            transition: 0.2s;
+        }
+        .m-btn-primary { background: var(--accent-blue); color: #000; }
+        .m-btn-danger { background: #ff1744; color: #fff; }
+        .m-btn-secondary { background: #222; color: #aaa; }
+
+        @media (max-width: 1024px) {
+            #result-name { font-size: 5rem; }
+            .studio-panel { padding: 25px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-glow"></div>
+    <div class="bg-grid"></div>
+    <div class="author-credit">Nguyễn Trường Sinh - THPT Định Quán</div>
+
+    <!-- MÀN HÌNH CẤU HÌNH -->
+    <section id="view-config">
+        <div class="studio-panel">
+            <h1 class="studio-title">PHÒNG ĐIỀU KHIỂN QUAY SỐ</h1>
+            
+            <div class="control-row">
+                <select id="class-select" class="custom-select" onchange="handleClassChange()"></select>
+                <div class="btn-group" style="display:flex; gap:10px;">
+                    <button class="btn-studio btn-blue" onclick="promptAddClass()">+ Thêm</button>
+                    <button class="btn-studio btn-gold" onclick="actionSaveClass()">Lưu</button>
+                    <button class="btn-studio btn-magenta" onclick="actionExportFile()">Xuất File</button>
+                    <button class="btn-studio" onclick="confirmDeleteClass()">Xóa</button>
+                </div>
+            </div>
+
+            <textarea id="student-list" class="editor-area" placeholder="Nhập danh sách học sinh (Mỗi tên một dòng)..." oninput="handleAutoSave()"></textarea>
+            
+            <div class="footer-info">
+                <span>Tự động lưu trong trình duyệt</span>
+                <span id="stat-count" style="color: var(--accent-blue); font-weight: bold;">0 Học sinh</span>
+            </div>
+
+            <button class="btn-launch" onclick="launchPicker()">CHỌN NGẪU NHIÊN</button>
+        </div>
+    </section>
+
+    <!-- MÀN HÌNH TRÌNH CHIẾU -->
+    <section id="view-picker">
+        <a href="#" class="btn-exit" onclick="exitPicker()">← Quay lại Cài đặt</a>
+        
+        <div id="result-name">SẴN SÀNG</div>
+
+        <div class="picker-hud">
+            <button id="btn-spin" class="btn-random" onclick="startRolling()">CHỌN NGẪU NHIÊN</button>
+            <button class="btn-util" onclick="actionResetList()">ĐẶT LẠI DANH SÁCH</button>
+        </div>
+    </section>
+
+    <!-- MODAL -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal-box">
+            <h3 id="modal-title" class="modal-title">THÔNG BÁO HỆ THỐNG</h3>
+            <p id="modal-body" style="line-height:1.6; color:#aaa;"></p>
+            <input type="text" id="modal-input" style="width:100%; padding:15px; background:#000; border:1px solid #333; color:#fff; margin-top:20px; border-radius:10px; display:none;">
+            <div id="modal-btns" class="modal-btns"></div>
+        </div>
+    </div>
+
+    <script id="app-core">
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const STORAGE_DATA = 'picker_v6_data';
+        const STORAGE_ACTIVE = 'picker_v6_active';
+
+        // --- KHỐI DỮ LIỆU ĐÓNG GÓI ---
+        /* DATA_START */
+        let appData = {
+            "12A2": {
+                current: "Lê Ngọc Quỳnh Anh\nLê Nguyễn Phương Anh\nLê Phạm Tuấn Anh\nNgô Quỳnh Anh\nNguyễn Lê Minh Anh\nCún Tiểu Bảo\nPhạm Lâm Thái Bảo\nNguyễn Ngọc Bích\nDìu Triệu Bình\nNguyễn Công Danh\nLê Đỗ Mỹ Duyên\nPhùng Mỹ Duyên\nNguyễn Quốc Đại\nPhan Anh Đạt\nTrần Duy Hùng\nLỷ Thu Hương\nHồ Nhịn Khang\nTrần Mạnh Khang\nNguyễn Thị Mỹ Lan\nNìm Thảo Liên\nPhan Ngọc Trà My\nHáu Yến Nhi\nNguyễn Thị Lan Nhi\nNguyễn Lâm Tâm Như\nĐinh Ngọc Tường Phát\nTrần Quang Vy Phát\nNguyễn Đăng Quang\nDương Nguyễn Anh Quân\nHồ Anh Quân\nĐỗ Ngọc Hương Quỳnh\nLương Nguyễn Như Quỳnh\nNguyễn Thị Như Quỳnh\nTrần Thị Kim Thoa\nVòng Kim Thủy\nCung Anh Thư\nLê Trần Ngọc Bảo Thy\nNguyễn Hoàng Bảo Thy\nHồ Trung Tín\nNguyễn Đức Minh Trí\nNguyễn Trần Mỹ Trinh\nHoàng Trần Nhật Tuân\nNguyễn Hoàng Phương Uyên\nNguyễn Anh Vũ\nHuỳnh Thị Hồng Yến",
+                original: "Lê Ngọc Quỳnh Anh\nLê Nguyễn Phương Anh\nLê Phạm Tuấn Anh\nNgô Quỳnh Anh\nNguyễn Lê Minh Anh\nCún Tiểu Bảo\nPhạm Lâm Thái Bảo\nNguyễn Ngọc Bích\nDìu Triệu Bình\nNguyễn Công Danh\nLê Đỗ Mỹ Duyên\nPhùng Mỹ Duyên\nNguyễn Quốc Đại\nPhan Anh Đạt\nTrần Duy Hùng\nLỷ Thu Hương\nHồ Nhịn Khang\nTrần Mạnh Khang\nNguyễn Thị Mỹ Lan\nNìm Thảo Liên\nPhan Ngọc Trà My\nHáu Yến Nhi\nNguyễn Thị Lan Nhi\nNguyễn Lâm Tâm Như\nĐinh Ngọc Tường Phát\nTrần Quang Vy Phát\nNguyễn Đăng Quang\nDương Nguyễn Anh Quân\nHồ Anh Quân\nĐỗ Ngọc Hương Quỳnh\nLương Nguyễn Như Quỳnh\nNguyễn Thị Như Quỳnh\nTrần Thị Kim Thoa\nVòng Kim Thủy\nCung Anh Thư\nLê Trần Ngọc Bảo Thy\nNguyễn Hoàng Bảo Thy\nHồ Trung Tín\nNguyễn Đức Minh Trí\nNguyễn Trần Mỹ Trinh\nHoàng Trần Nhật Tuân\nNguyễn Hoàng Phương Uyên\nNguyễn Anh Vũ\nHuỳnh Thị Hồng Yến"
+            },
+            "NHÓM": {
+                current: "NHÓM 1\nNHÓM 2\nNHÓM 3\nNHÓM 4",
+                original: "NHÓM 1\nNHÓM 2\nNHÓM 3\nNHÓM 4"
+            },
+            "NHÓM 1": {
+                current: "Lê Đ Mỹ Duyên\nLê N Quỳnh Anh\nĐinh Ngọc Tường Phát\ncúnTiểu Bảo\nPham lâmThái Bảo\nLê phạm Tuấn Anh\nHồ Anh Quân\nNguyễn Hoàng Bảo Thy\nCungAnh thư\nVòng Kim Thủy\nĐỗ Hương quỳnh\nNguyễn Quốc Đại",
+                original: "Lê Đ Mỹ Duyên\nLê N Quỳnh Anh\nĐinh Ngọc Tường Phát\ncúnTiểu Bảo\nPham lâmThái Bảo\nLê phạm Tuấn Anh\nHồ Anh Quân\nNguyễn Hoàng Bảo Thy\nCungAnh thư\nVòng Kim Thủy\nĐỗ Hương quỳnh\nNguyễn Quốc Đại"
+            },
+            "NHÓM 2": {
+                current: "Phan Anh Đạt\nNguyễn Thị Như Quỳnh\nNguyễn Anh Vũ\nNguyễn Đăng Quang\nNguyễn Lâm Tâm Như\nLê Nguyễn Phương Anh\nTrần Mạnh Khang\nDìu Triệu Bình\nLê Trần Ngọc Bảo Thy\nNguyễn Thị Mỹ Lan\nNguyễn Thị Lan Nhi",
+                original: "Phan Anh Đạt\nNguyễn Thị Như Quỳnh\nNguyễn Anh Vũ\nNguyễn Đăng Quang\nNguyễn Lâm Tâm Như\nLê Nguyễn Phương Anh\nTrần Mạnh Khang\nDìu Triệu Bình\nLê Trần Ngọc Bảo Thy\nNguyễn Thị Mỹ Lan\nNguyễn Thị Lan Nhi"
+            },
+            "NHÓM 3": {
+                current: "Huỳnh Thị Hồng Yến\nNguyễn Hoàng Phương Uyên\nTrần Duy Hùng\nNguyễn Công Danh\nPhan Ngọc Trà My\nLìm Thảo Liên\nLỷ Thu Hương\nLương Nguyễn Như Quỳnh\nNguyễn Đức Minh Trí\nTrần Thị Kim Thoa\nTrần Quang Vy Phát",
+                original: "Huỳnh Thị Hồng Yến\nNguyễn Hoàng Phương Uyên\nTrần Duy Hùng\nNguyễn Công Danh\nPhan Ngọc Trà My\nLìm Thảo Liên\nLỷ Thu Hương\nLương Nguyễn Như Quỳnh\nNguyễn Đức Minh Trí\nTrần Thị Kim Thoa\nTrần Quang Vy Phát"
+            },
+            "NHÓM 4": {
+                current: "Phùng Mỹ Duyên\nHáu Yến Nhi\nNguyễn Lê Minh Anh\nHoàng Trần Nhật Tuân\nHồ Nhịn Khang\nHồ Trung Tín\nNguyễn Trần Mỹ Trinh\nNguyễn Ngọc Bích\nNgô Quỳnh Anh\nDương Nguyễn Anh Quân",
+                original: "Phùng Mỹ Duyên\nHáu Yến Nhi\nNguyễn Lê Minh Anh\nHoàng Trần Nhật Tuân\nHồ Nhịn Khang\nHồ Trung Tín\nNguyễn Trần Mỹ Trinh\nNguyễn Ngọc Bích\nNgô Quỳnh Anh\nDương Nguyễn Anh Quân"
+            }
+        };
+        let activeClass = "12A2";
+        let isExported = false;
+        /* DATA_END */
+        
+        let isSpinning = false;
+
+        // --- NAVIGATION ---
+        function launchPicker() {
+            const list = getStudents();
+            if(list.length === 0) return alertModal("Lớp học này chưa có danh sách học sinh!");
+            document.getElementById('view-config').style.display = 'none';
+            document.getElementById('view-picker').style.display = 'flex';
+        }
+
+        function exitPicker() {
+            document.getElementById('view-picker').style.display = 'none';
+            document.getElementById('view-config').style.display = 'flex';
+            refreshStudioUI();
+        }
+
+        // --- APP INIT ---
+        function initApp() {
+            // Nếu là file đã xuất (isExported = true), ưu tiên dùng dữ liệu trong biến appData
+            // Lưu ý: Biến appData lúc này đã được thay thế bằng giá trị hard-code khi xuất file
+            if (isExported) {
+                // Sync to storage để giữ trạng thái cho session này nếu người dùng reload trang
+                saveAllStorage();
+            } else {
+                // Nếu là file gốc, thử load từ localStorage để lấy dữ liệu mới nhất người dùng đã nhập
+                const saved = localStorage.getItem(STORAGE_DATA);
+                if(saved) {
+                    try { appData = JSON.parse(saved); } catch(e) {}
+                }
+                const active = localStorage.getItem(STORAGE_ACTIVE);
+                if(active && appData[active]) activeClass = active;
+                else activeClass = Object.keys(appData)[0] || "12A2";
+            }
+            populateClassSelect();
+            refreshStudioUI();
+        }
+
+        function populateClassSelect() {
+            const sel = document.getElementById('class-select');
+            sel.innerHTML = '';
+            Object.keys(appData).sort().forEach(name => {
+                const opt = document.createElement('option');
+                opt.value = name; opt.text = name;
+                if(name === activeClass) opt.selected = true;
+                sel.appendChild(opt);
+            });
+        }
+
+        function handleClassChange() {
+            activeClass = document.getElementById('class-select').value;
+            localStorage.setItem(STORAGE_ACTIVE, activeClass);
+            refreshStudioUI();
+            document.getElementById('result-name').innerText = "SẴN SÀNG";
+            document.getElementById('result-name').classList.remove('winner-active');
+        }
+
+        function refreshStudioUI() {
+            const area = document.getElementById('student-list');
+            area.value = appData[activeClass]?.current || "";
+            document.getElementById('stat-count').innerText = `${getStudents().length} Học sinh`;
+        }
+
+        function handleAutoSave() {
+            if(!appData[activeClass]) return;
+            appData[activeClass].current = document.getElementById('student-list').value;
+            localStorage.setItem(STORAGE_DATA, JSON.stringify(appData));
+            document.getElementById('stat-count').innerText = `${getStudents().length} Học sinh`;
+        }
+
+        function getStudents() {
+            return document.getElementById('student-list').value.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+        }
+
+        function actionSaveClass() {
+            const val = document.getElementById('student-list').value;
+            appData[activeClass].original = val;
+            appData[activeClass].current = val;
+            localStorage.setItem(STORAGE_DATA, JSON.stringify(appData));
+            alertModal(`Đã lưu dữ liệu gốc cho lớp "${activeClass}".`);
+        }
+
+        function actionResetList() {
+            if(isSpinning) return;
+            appData[activeClass].current = appData[activeClass].original;
+            localStorage.setItem(STORAGE_DATA, JSON.stringify(appData));
+            document.getElementById('result-name').innerText = "ĐÃ ĐẶT LẠI";
+            document.getElementById('result-name').classList.remove('winner-active');
+            refreshStudioUI();
+            alertModal("Đã khôi phục danh sách đầy đủ.");
+        }
+
+        function promptAddClass() {
+            customPrompt("Nhập tên lớp học mới:", (name) => {
+                const clean = name ? name.trim() : "";
+                if(!clean) return;
+                if(appData[clean]) return alertModal("Lớp học đã tồn tại!");
+                appData[clean] = { current: "", original: "" };
+                activeClass = clean;
+                saveAllStorage();
+                populateClassSelect();
+                refreshStudioUI();
+            });
+        }
+
+        function confirmDeleteClass() {
+            if(Object.keys(appData).length <= 1) return alertModal("Không thể xóa lớp cuối cùng!");
+            customConfirm(`Xác nhận xóa vĩnh viễn lớp "${activeClass}"?`, () => {
+                delete appData[activeClass];
+                activeClass = Object.keys(appData)[0];
+                saveAllStorage();
+                populateClassSelect();
+                refreshStudioUI();
+            });
+        }
+
+        function saveAllStorage() {
+            localStorage.setItem(STORAGE_DATA, JSON.stringify(appData));
+            localStorage.setItem(STORAGE_ACTIVE, activeClass);
+        }
+
+        // --- PICKER ENGINE ---
+        function startRolling() {
+            if(isSpinning) return;
+            const pool = getStudents();
+            if(pool.length === 0) return alertModal("Danh sách trống! Vui lòng nhấn Đặt lại.");
+
+            isSpinning = true;
+            document.getElementById('btn-spin').disabled = true;
+            const display = document.getElementById('result-name');
+            display.classList.remove('winner-active');
+
+            let delay = 15;
+            const maxDelay = 500;
+            const factor = 1.09;
+
+            function step() {
+                const winner = pool[Math.floor(Math.random() * pool.length)];
+                display.innerText = winner;
+                playTick();
+
+                if(delay < maxDelay) {
+                    delay *= factor;
+                    setTimeout(step, delay);
+                } else {
+                    finalizeWinner(winner);
+                }
+            }
+            step();
+        }
+
+        function finalizeWinner(winner) {
+            isSpinning = false;
+            document.getElementById('btn-spin').disabled = false;
+            const display = document.getElementById('result-name');
+            display.classList.add('winner-active');
+            playWinSound();
+
+            setTimeout(() => {
+                customConfirm(`CHÚC MỪNG: ${winner}!\nBạn có muốn XÓA tên này khỏi danh sách quay tiếp theo không?`, () => {
+                    const newList = getStudents().filter(n => n !== winner);
+                    document.getElementById('student-list').value = newList.join('\n');
+                    handleAutoSave();
+                }, () => {}, "XÓA TÊN", "GIỮ LẠI");
+            }, 700);
+        }
+
+        // --- AUDIO ---
+        function playTick() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            osc.connect(g); g.connect(audioCtx.destination);
+            
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+            g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            g.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            
+            osc.start(); 
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        function playWinSound() {
+            const notes = [523.25, 659.25, 783.99, 1046.50]; 
+            const now = audioCtx.currentTime;
+            
+            notes.forEach((freq, i) => {
+                const osc = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                osc.connect(g); g.connect(audioCtx.destination);
+                
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.1);
+                g.gain.setValueAtTime(0.1, audioCtx.currentTime + i * 0.1);
+                g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.1 + 0.4);
+                
+                osc.start(audioCtx.currentTime + i * 0.1);
+                osc.stop(audioCtx.currentTime + i * 0.1 + 0.4);
+            });
+            
+            const osc2 = audioCtx.createOscillator();
+            const g2 = audioCtx.createGain();
+            osc2.connect(g2); g2.connect(audioCtx.destination);
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(1046.50, now + 0.3);
+            g2.gain.setValueAtTime(0, now + 0.3);
+            g2.gain.linearRampToValueAtTime(0.15, now + 0.35);
+            g2.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+            osc2.start(now + 0.3);
+            osc2.stop(now + 1.2);
+        }
+
+        // --- EXPORT (HARD-BAKING METHOD) ---
+        function actionExportFile() {
+            // 1. Sync current UI to memory
+            if (appData[activeClass]) {
+                appData[activeClass].current = document.getElementById('student-list').value;
+            }
+            saveAllStorage();
+
+            // 2. Prepare Data String
+            const dataString = JSON.stringify(appData, null, 4).replace(/<\/script>/g, "<\\/script>");
+            const activeString = activeClass.replace(/"/g, '\\"');
+            
+            // 3. Create the new Replacement Block
+            const newContent = `
+        let appData = ${dataString};
+        let activeClass = "${activeString}";
+        let isExported = true;
+            `;
+
+            // 4. Get HTML
+            let fullHTML = document.documentElement.outerHTML;
+
+            // 5. Replace the Data Block using regex
+            // Tìm và thay thế toàn bộ khối dữ liệu giữa 2 comment DATA_START và DATA_END
+            const regex = /\/\* DATA_START \*\/[\s\S]*?\/\* DATA_END \*\//;
+            
+            if (regex.test(fullHTML)) {
+                fullHTML = fullHTML.replace(regex, `/* DATA_START */${newContent}/* DATA_END */`);
+            } else {
+                alertModal("Lỗi: Không tìm thấy khối dữ liệu gốc. Vui lòng tải lại trang.");
+                return;
+            }
+
+            // 6. Download
+            const blob = new Blob([fullHTML], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const date = new Date().toISOString().slice(0,10);
+            a.download = `RandomPicker_FullPack_${date}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            alertModal("Xuất file thành công! File này đã được nạp sẵn toàn bộ dữ liệu của bạn.");
+        }
+
+        // --- MODAL UTILS ---
+        function alertModal(msg) {
+            showGeneralModal({ title: "THÔNG BÁO", msg, buttons: [{text: "ĐÃ HIỂU", class: "m-btn-primary"}] });
+        }
+
+        function customPrompt(msg, callback) {
+            showGeneralModal({ title: "NHẬP DỮ LIỆU", msg, input: true, buttons: [
+                {text: "HỦY", class: "m-btn-secondary"},
+                {text: "TẠO", class: "m-btn-primary", onClick: callback}
+            ]});
+        }
+
+        function customConfirm(msg, onYes, onNo, yesText="XÁC NHẬN", noText="HỦY") {
+            showGeneralModal({ title: "XÁC NHẬN", msg, buttons: [
+                {text: noText, class: "m-btn-secondary", onClick: onNo},
+                {text: yesText, class: "m-btn-danger", onClick: onYes}
+            ]});
+        }
+
+        function showGeneralModal({title, msg, input, buttons}) {
+            const m = document.getElementById('modal-overlay');
+            const btns = document.getElementById('modal-btns');
+            const inp = document.getElementById('modal-input');
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-body').innerText = msg;
+            if(input) { inp.style.display = 'block'; inp.value = ''; setTimeout(()=>inp.focus(), 100); }
+            else { inp.style.display = 'none'; }
+            btns.innerHTML = '';
+            buttons.forEach(b => {
+                const btn = document.createElement('button');
+                btn.className = `m-btn ${b.class}`;
+                btn.innerText = b.text;
+                btn.onclick = () => {
+                    if(b.onClick) b.onClick(inp.value);
+                    m.style.display = 'none';
+                };
+                btns.appendChild(btn);
+            });
+            m.style.display = 'flex';
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
