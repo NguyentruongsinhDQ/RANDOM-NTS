@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Công cụ RandomNTS2026</title>
+    <title>Công cụ Chọn Ngẫu nhiên Cao cấp V7.2</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;500;800;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
@@ -67,7 +67,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
-            overflow-y: auto;
+            overflow-y: auto; /* Cho phép cuộn trên màn hình nhỏ */
         }
 
         .studio-panel {
@@ -146,6 +146,7 @@
             justify-content: center;
             gap: 8px;
             white-space: nowrap;
+            flex: 1; /* Để nút co giãn đều trên mobile */
         }
 
         .btn-studio:hover {
@@ -227,45 +228,46 @@
 
         #result-container {
             width: 90%;
-            height: 50vh;
+            height: 60vh; /* Tăng không gian hiển thị */
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-top: -10vh;
+            margin-top: -5vh;
         }
 
         #result-name {
-            font-size: 8rem; /* Giá trị mặc định */
+            /* Sử dụng clamp để tự động điều chỉnh cỡ chữ theo chiều rộng màn hình */
+            font-size: clamp(3rem, 12vw, 9rem);
             font-weight: 900;
             text-align: center;
             width: 100%;
-            padding: 20px;
+            padding: 10px;
             line-height: 1.1;
-            word-wrap: break-word; /* Quan trọng để xuống dòng nếu quá dài */
+            word-wrap: break-word;
             text-transform: uppercase;
             color: #fff;
             text-shadow: 0 10px 30px rgba(0,0,0,0.3);
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            white-space: normal; /* Cho phép xuống dòng nếu cần thiết */
+            white-space: normal;
         }
 
         .picker-hud {
             position: absolute;
-            bottom: 50px;
+            bottom: 40px;
             display: flex;
             gap: 20px;
             align-items: center;
             width: 90%;
             justify-content: center;
             flex-wrap: wrap;
-            z-index: 1001; /* Trên canvas confetti */
+            z-index: 1001; 
         }
 
         .btn-random {
             background: #FFFFFF;
             color: var(--royal-blue);
             font-family: 'Exo 2', sans-serif;
-            font-size: 2rem;
+            font-size: clamp(1.5rem, 4vw, 2.2rem); /* Chữ nút cũng responsive */
             font-weight: 900;
             padding: 18px 60px;
             border: none;
@@ -299,7 +301,7 @@
 
         .btn-exit {
             position: absolute;
-            top: 30px; left: 30px;
+            top: 20px; left: 20px;
             color: rgba(255,255,255,0.6);
             font-size: 0.9rem;
             text-decoration: none;
@@ -342,27 +344,29 @@
             font-weight: 500;
         }
 
-        /* --- RESPONSIVE BREAKPOINTS --- */
-        @media (max-width: 1024px) {
+        /* --- RESPONSIVE BREAKPOINTS (Mobile & Tablet) --- */
+        @media (max-width: 1024px) { /* Tablet / iPad */
             .studio-panel { max-width: 95%; padding: 30px; }
-            #result-name { font-size: 6rem; }
-            .btn-random { font-size: 1.8rem; padding: 15px 50px; }
+            .btn-random { padding: 15px 50px; }
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 768px) { /* Mobile */
+            /* Config Screen Adjustments */
+            #view-config { align-items: flex-start; } /* Cho phép cuộn từ trên xuống */
+            .studio-panel { padding: 20px; margin-top: 20px; margin-bottom: 20px;}
             .studio-title { font-size: 1.4rem; }
-            .control-row { flex-direction: column; gap: 10px; }
-            .btn-group { justify-content: space-between; }
-            .btn-studio { flex: 1; padding: 12px 10px; font-size: 0.75rem; }
+            .control-row { flex-direction: column; gap: 15px; }
+            .btn-group { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
             .custom-select { width: 100%; }
-            .btn-launch { font-size: 1.2rem; padding: 18px; }
-            .editor-area { height: 180px; }
+            .btn-launch { font-size: 1.2rem; padding: 15px; }
+            .editor-area { height: 150px; }
 
-            #result-name { font-size: 3.5rem; padding: 10px; margin-top: -15vh; }
-            .picker-hud { flex-direction: column; bottom: 30px; gap: 15px; width: 100%; }
-            .btn-random { width: 80%; font-size: 1.6rem; padding: 15px 0; }
-            .btn-util { width: 60%; font-size: 0.85rem; padding: 12px 0; }
-            .btn-exit { top: 15px; left: 15px; font-size: 0.75rem; padding: 6px 12px; }
+            /* Picker Screen Adjustments */
+            #result-container { height: 60vh; margin-top: 0; }
+            .picker-hud { flex-direction: column; bottom: 40px; gap: 15px; width: 100%; }
+            .btn-random { width: 90%; padding: 15px 0; }
+            .btn-util { width: 70%; padding: 12px 0; }
+            .btn-exit { top: 15px; left: 15px; font-size: 0.75rem; }
             .author-credit { font-size: 0.6rem; bottom: 5px; right: 10px; }
         }
 
@@ -429,7 +433,7 @@
             
             <div class="control-row">
                 <select id="class-select" class="custom-select" onchange="handleClassChange()"></select>
-                <div class="btn-group" style="display:flex; gap:10px;">
+                <div class="btn-group">
                     <button class="btn-studio btn-blue" onclick="promptAddClass()">+ Thêm</button>
                     <button class="btn-studio btn-gold" onclick="actionSaveClass()">Lưu</button>
                     <button class="btn-studio btn-magenta" onclick="actionExportFile()">Xuất File</button>
@@ -514,6 +518,18 @@
         let confettiActive = false;
         let particles = [];
 
+        // --- UNLOCK AUDIO ON INTERACTION (FIX MOBILE) ---
+        function unlockAudio() {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume().then(() => console.log('Audio Context Resumed'));
+            }
+            // Xóa listener sau khi đã unlock
+            document.removeEventListener('click', unlockAudio);
+            document.removeEventListener('touchstart', unlockAudio);
+        }
+        document.addEventListener('click', unlockAudio);
+        document.addEventListener('touchstart', unlockAudio);
+
         // --- NAVIGATION ---
         function launchPicker() {
             const list = getStudents();
@@ -533,6 +549,7 @@
         function initApp() {
             initConfetti();
             if (isExported) {
+                // Nếu là file đã xuất, lưu dữ liệu hard-coded vào localStorage để dùng
                 saveAllStorage();
             } else {
                 const saved = localStorage.getItem(STORAGE_DATA);
@@ -643,7 +660,7 @@
             document.getElementById('btn-spin').disabled = true;
             const display = document.getElementById('result-name');
             display.classList.remove('winner-active');
-            display.style.fontSize = "8rem"; 
+            display.style.fontSize = ""; // Reset inline size to rely on CSS
 
             let delay = 15;
             const maxDelay = 500;
@@ -652,6 +669,10 @@
             function step() {
                 const winner = pool[Math.floor(Math.random() * pool.length)];
                 display.innerText = winner;
+                
+                // Optional: Dynamic font size during spin slightly for effect
+                // fitText(display, winner); 
+                
                 playTick();
 
                 if(delay < maxDelay) {
@@ -669,7 +690,7 @@
             document.getElementById('btn-spin').disabled = false;
             const display = document.getElementById('result-name');
             
-            fitText(display, winner); 
+            fitText(display, winner); // Ensure winner name fits
             
             display.classList.add('winner-active');
             playWinSound(); // Epic C Major
@@ -687,77 +708,71 @@
         // --- AUTO FIT TEXT ---
         function fitText(element, text) {
             element.innerText = text;
-            let fontSize = 8;
-            element.style.fontSize = fontSize + 'rem';
+            // Bắt đầu từ 12vw (hoặc 8rem trên desktop) và giảm dần
+            let size = 12; // vw unit
+            element.style.fontSize = size + 'vw';
             
-            const parentWidth = element.parentElement.clientWidth;
+            // Nếu dùng đơn vị vw vẫn bị tràn chiều ngang hoặc chiều cao, giảm tiếp
+            // Giới hạn max-width của text là 90vw
+            while ((element.scrollWidth > window.innerWidth * 0.9) && size > 4) {
+                size -= 0.5;
+                element.style.fontSize = size + 'vw';
+            }
             
-            while (element.scrollWidth > parentWidth && fontSize > 2) {
-                fontSize -= 0.5;
-                element.style.fontSize = fontSize + 'rem';
+            // Giới hạn max size cho desktop (không quá 150px)
+            if (window.innerWidth > 1024 && size > 8) {
+                 element.style.fontSize = '8rem';
             }
         }
 
         // --- AUDIO ---
         function playTick() {
             if (audioCtx.state === 'suspended') audioCtx.resume();
-            const o = audioCtx.createOscillator();
+            
+            const osc = audioCtx.createOscillator();
             const g = audioCtx.createGain();
-            o.connect(g); g.connect(audioCtx.destination);
-            o.type = 'triangle';
-            o.frequency.setValueAtTime(600, audioCtx.currentTime);
+            osc.connect(g); g.connect(audioCtx.destination);
+            
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
             g.gain.setValueAtTime(0.1, audioCtx.currentTime);
             g.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-            o.start(); o.stop(audioCtx.currentTime + 0.1);
+            
+            osc.start(); 
+            osc.stop(audioCtx.currentTime + 0.1);
         }
 
         function playWinSound() {
-            // Fanfare: C G E C (Ascending) + C G E C (Descending)
-            // Faster and more energetic
-            const melody = [
-                { f: 523.25, t: 0 },    // C5
-                { f: 659.25, t: 0.1 },  // E5
-                { f: 783.99, t: 0.2 },  // G5
-                { f: 1046.50, t: 0.3 }, // C6
-                { f: 783.99, t: 0.4 },  // G5
-                { f: 1046.50, t: 0.5 }, // C6
-                { f: 1318.51, t: 0.7 }  // E6 (High ending)
-            ];
-            
+            const notes = [523.25, 659.25, 783.99, 1046.50]; 
             const now = audioCtx.currentTime;
             
-            melody.forEach(note => {
+            notes.forEach((freq, i) => {
                 const osc = audioCtx.createOscillator();
                 const g = audioCtx.createGain();
                 osc.connect(g); g.connect(audioCtx.destination);
                 
-                osc.type = 'square'; // 8-bit vibe
-                osc.frequency.value = note.f;
+                osc.type = 'square';
+                osc.frequency.value = freq;
                 
-                g.gain.setValueAtTime(0, now + note.t);
-                g.gain.linearRampToValueAtTime(0.1, now + note.t + 0.05);
-                g.gain.exponentialRampToValueAtTime(0.001, now + note.t + 0.3);
-                
-                osc.start(now + note.t);
-                osc.stop(now + note.t + 0.4);
-            });
-
-            // Clap / Firework effect (Noise burst)
-            for(let i=0; i<5; i++) {
-                const osc = audioCtx.createOscillator();
-                const g = audioCtx.createGain();
-                osc.connect(g); g.connect(audioCtx.destination);
-                osc.type = 'sawtooth';
-                // Random low frequencies for "boom"
-                osc.frequency.value = 100 + Math.random() * 200; 
-                
-                const start = now + 0.3 + (Math.random() * 0.5);
-                g.gain.setValueAtTime(0.1, start);
-                g.gain.exponentialRampToValueAtTime(0.001, start + 0.2);
+                const start = now + (i * 0.1);
+                g.gain.setValueAtTime(0, start);
+                g.gain.linearRampToValueAtTime(0.1, start + 0.05);
+                g.gain.exponentialRampToValueAtTime(0.001, start + 0.4);
                 
                 osc.start(start);
-                osc.stop(start + 0.2);
-            }
+                osc.stop(start + 0.4);
+            });
+            
+            const osc2 = audioCtx.createOscillator();
+            const g2 = audioCtx.createGain();
+            osc2.connect(g2); g2.connect(audioCtx.destination);
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(1046.50, now + 0.3); // High C
+            g2.gain.setValueAtTime(0, now + 0.3);
+            g2.gain.linearRampToValueAtTime(0.15, now + 0.35);
+            g2.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+            osc2.start(now + 0.3);
+            osc2.stop(now + 1.2);
         }
 
         // --- CONFETTI SYSTEM ---
@@ -862,7 +877,7 @@
             const a = document.createElement('a');
             a.href = url;
             const date = new Date().toISOString().slice(0,10);
-            a.download = `RandomPicker_Full_V7.1_${date}.html`;
+            a.download = `RandomPicker_Data_${date}.html`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
