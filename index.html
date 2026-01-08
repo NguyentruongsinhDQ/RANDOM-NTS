@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Công cụ Random - Nguyễn Trường Sinh ĐQ</title>
+    <title>Công cụ Chọn Ngẫu nhiên Cao cấp V7.1</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;500;800;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
@@ -31,7 +31,7 @@
             font-family: 'Exo 2', sans-serif;
             height: 100vh;
             width: 100vw;
-            overflow: hidden; /* Mặc định ẩn thanh cuộn body */
+            overflow: hidden;
             transition: background 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -39,7 +39,7 @@
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle at 50% 50%, #001144 0%, #050a1b 100%);
-            z-index: -1;
+            z-index: -2;
         }
         .bg-grid {
             position: fixed;
@@ -47,7 +47,16 @@
             background-image: linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
                               linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
             background-size: 50px 50px;
-            z-index: -1;
+            z-index: -2;
+        }
+
+        /* Confetti Canvas */
+        #confetti-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 999;
         }
 
         /* --- STUDIO MODE (CẤU HÌNH) --- */
@@ -58,7 +67,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
-            overflow-y: auto; /* Cho phép cuộn nếu màn hình nhỏ */
+            overflow-y: auto;
         }
 
         .studio-panel {
@@ -71,7 +80,6 @@
             padding: 40px;
             box-shadow: 0 25px 50px rgba(0,0,0,0.5);
             position: relative;
-            /* Đảm bảo panel không bị quá khổ trên mobile */
             margin: auto; 
         }
 
@@ -217,20 +225,28 @@
             background: radial-gradient(circle at center, #002299 0%, #001144 100%);
         }
 
+        #result-container {
+            width: 90%;
+            height: 50vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: -10vh;
+        }
+
         #result-name {
-            font-size: 8rem;
+            font-size: 8rem; /* Giá trị mặc định */
             font-weight: 900;
             text-align: center;
-            width: 90%;
+            width: 100%;
             padding: 20px;
             line-height: 1.1;
-            word-wrap: break-word;
+            word-wrap: break-word; /* Quan trọng để xuống dòng nếu quá dài */
             text-transform: uppercase;
             color: #fff;
             text-shadow: 0 10px 30px rgba(0,0,0,0.3);
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            /* Center vertically roughly */
-            margin-top: -10vh;
+            white-space: normal; /* Cho phép xuống dòng nếu cần thiết */
         }
 
         .picker-hud {
@@ -242,6 +258,7 @@
             width: 90%;
             justify-content: center;
             flex-wrap: wrap;
+            z-index: 1001; /* Trên canvas confetti */
         }
 
         .btn-random {
@@ -295,19 +312,20 @@
             background: rgba(0,0,0,0.2);
             padding: 8px 16px;
             border-radius: 30px;
+            z-index: 1001;
         }
         .btn-exit:hover { color: #fff; background: rgba(0,0,0,0.4); }
 
         /* WINNER EFFECT */
         .winner-active {
             color: var(--accent-gold) !important;
-            text-shadow: 0 0 30px rgba(255, 215, 0, 0.5), 0 0 60px rgba(255, 215, 0, 0.2) !important;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.6), 0 0 60px rgba(255, 215, 0, 0.4) !important;
             animation: winnerGlow 0.5s infinite alternate;
         }
 
         @keyframes winnerGlow {
             from { transform: scale(1); }
-            to { transform: scale(1.03); }
+            to { transform: scale(1.05); }
         }
 
         .author-credit {
@@ -324,15 +342,14 @@
             font-weight: 500;
         }
 
-        /* --- RESPONSIVE BREAKPOINTS (Mobile & Tablet) --- */
-        @media (max-width: 1024px) { /* Tablet / Small Laptop */
+        /* --- RESPONSIVE BREAKPOINTS --- */
+        @media (max-width: 1024px) {
             .studio-panel { max-width: 95%; padding: 30px; }
             #result-name { font-size: 6rem; }
             .btn-random { font-size: 1.8rem; padding: 15px 50px; }
         }
 
-        @media (max-width: 768px) { /* Mobile */
-            /* Config Screen */
+        @media (max-width: 768px) {
             .studio-title { font-size: 1.4rem; }
             .control-row { flex-direction: column; gap: 10px; }
             .btn-group { justify-content: space-between; }
@@ -341,33 +358,11 @@
             .btn-launch { font-size: 1.2rem; padding: 18px; }
             .editor-area { height: 180px; }
 
-            /* Picker Screen */
-            #result-name { 
-                font-size: 3.5rem; /* Giảm size chữ để vừa màn hình điện thoại */
-                padding: 10px; 
-                margin-top: -15vh;
-            }
-            .picker-hud { 
-                flex-direction: column; 
-                bottom: 30px; 
-                gap: 15px; 
-                width: 100%;
-            }
-            .btn-random { 
-                width: 80%; 
-                font-size: 1.6rem; 
-                padding: 15px 0; 
-            }
-            .btn-util { 
-                width: 60%; 
-                font-size: 0.85rem; 
-                padding: 12px 0;
-            }
-            .btn-exit { 
-                top: 15px; left: 15px; 
-                font-size: 0.75rem;
-                padding: 6px 12px;
-            }
+            #result-name { font-size: 3.5rem; padding: 10px; margin-top: -15vh; }
+            .picker-hud { flex-direction: column; bottom: 30px; gap: 15px; width: 100%; }
+            .btn-random { width: 80%; font-size: 1.6rem; padding: 15px 0; }
+            .btn-util { width: 60%; font-size: 0.85rem; padding: 12px 0; }
+            .btn-exit { top: 15px; left: 15px; font-size: 0.75rem; padding: 6px 12px; }
             .author-credit { font-size: 0.6rem; bottom: 5px; right: 10px; }
         }
 
@@ -424,6 +419,7 @@
 
     <div class="bg-glow"></div>
     <div class="bg-grid"></div>
+    <canvas id="confetti-canvas"></canvas>
     <div class="author-credit">Nguyễn Trường Sinh - THPT Định Quán</div>
 
     <!-- MÀN HÌNH CẤU HÌNH -->
@@ -433,7 +429,7 @@
             
             <div class="control-row">
                 <select id="class-select" class="custom-select" onchange="handleClassChange()"></select>
-                <div class="btn-group">
+                <div class="btn-group" style="display:flex; gap:10px;">
                     <button class="btn-studio btn-blue" onclick="promptAddClass()">+ Thêm</button>
                     <button class="btn-studio btn-gold" onclick="actionSaveClass()">Lưu</button>
                     <button class="btn-studio btn-magenta" onclick="actionExportFile()">Xuất File</button>
@@ -456,7 +452,9 @@
     <section id="view-picker">
         <a href="#" class="btn-exit" onclick="exitPicker()">← Quay lại Cài đặt</a>
         
-        <div id="result-name">SẴN SÀNG</div>
+        <div id="result-container">
+            <div id="result-name">SẴN SÀNG</div>
+        </div>
 
         <div class="picker-hud">
             <button id="btn-spin" class="btn-random" onclick="startRolling()">CHỌN NGẪU NHIÊN</button>
@@ -464,7 +462,7 @@
         </div>
     </section>
 
-    <!-- HỆ THỐNG THÔNG BÁO -->
+    <!-- MODAL -->
     <div id="modal-overlay" class="modal-overlay">
         <div class="modal-box">
             <h3 id="modal-title" class="modal-title">THÔNG BÁO HỆ THỐNG</h3>
@@ -512,6 +510,9 @@
         /* DATA_END */
         
         let isSpinning = false;
+        let confettiCtx = null;
+        let confettiActive = false;
+        let particles = [];
 
         // --- NAVIGATION ---
         function launchPicker() {
@@ -524,17 +525,16 @@
         function exitPicker() {
             document.getElementById('view-picker').style.display = 'none';
             document.getElementById('view-config').style.display = 'flex';
+            stopConfetti();
             refreshStudioUI();
         }
 
         // --- APP INIT ---
         function initApp() {
-            // Nếu là file đã xuất (isExported = true), ưu tiên dùng dữ liệu hard-coded trong biến appData
+            initConfetti();
             if (isExported) {
-                // Sync to storage để giữ trạng thái cho session này nếu người dùng reload trang
                 saveAllStorage();
             } else {
-                // Nếu là file gốc, thử load từ localStorage để lấy dữ liệu mới nhất người dùng đã nhập
                 const saved = localStorage.getItem(STORAGE_DATA);
                 if(saved) {
                     try { appData = JSON.parse(saved); } catch(e) {}
@@ -564,6 +564,7 @@
             refreshStudioUI();
             document.getElementById('result-name').innerText = "SẴN SÀNG";
             document.getElementById('result-name').classList.remove('winner-active');
+            stopConfetti();
         }
 
         function refreshStudioUI() {
@@ -597,6 +598,7 @@
             localStorage.setItem(STORAGE_DATA, JSON.stringify(appData));
             document.getElementById('result-name').innerText = "ĐÃ ĐẶT LẠI";
             document.getElementById('result-name').classList.remove('winner-active');
+            stopConfetti();
             refreshStudioUI();
             alertModal("Đã khôi phục danh sách đầy đủ.");
         }
@@ -633,6 +635,7 @@
         // --- PICKER ENGINE ---
         function startRolling() {
             if(isSpinning) return;
+            stopConfetti();
             const pool = getStudents();
             if(pool.length === 0) return alertModal("Danh sách trống! Vui lòng nhấn Đặt lại.");
 
@@ -640,6 +643,7 @@
             document.getElementById('btn-spin').disabled = true;
             const display = document.getElementById('result-name');
             display.classList.remove('winner-active');
+            display.style.fontSize = "8rem"; 
 
             let delay = 15;
             const maxDelay = 500;
@@ -664,8 +668,12 @@
             isSpinning = false;
             document.getElementById('btn-spin').disabled = false;
             const display = document.getElementById('result-name');
+            
+            fitText(display, winner); 
+            
             display.classList.add('winner-active');
-            playWinSound();
+            playWinSound(); // Epic C Major
+            fireConfetti(); // Pháo giấy
 
             setTimeout(() => {
                 customConfirm(`CHÚC MỪNG: ${winner}!\nBạn có muốn XÓA tên này khỏi danh sách quay tiếp theo không?`, () => {
@@ -673,79 +681,173 @@
                     document.getElementById('student-list').value = newList.join('\n');
                     handleAutoSave();
                 }, () => {}, "XÓA TÊN", "GIỮ LẠI");
-            }, 700);
+            }, 1000); 
+        }
+
+        // --- AUTO FIT TEXT ---
+        function fitText(element, text) {
+            element.innerText = text;
+            let fontSize = 8;
+            element.style.fontSize = fontSize + 'rem';
+            
+            const parentWidth = element.parentElement.clientWidth;
+            
+            while (element.scrollWidth > parentWidth && fontSize > 2) {
+                fontSize -= 0.5;
+                element.style.fontSize = fontSize + 'rem';
+            }
         }
 
         // --- AUDIO ---
         function playTick() {
             if (audioCtx.state === 'suspended') audioCtx.resume();
-            
-            const osc = audioCtx.createOscillator();
+            const o = audioCtx.createOscillator();
             const g = audioCtx.createGain();
-            osc.connect(g); g.connect(audioCtx.destination);
-            
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+            o.connect(g); g.connect(audioCtx.destination);
+            o.type = 'triangle';
+            o.frequency.setValueAtTime(600, audioCtx.currentTime);
             g.gain.setValueAtTime(0.1, audioCtx.currentTime);
             g.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-            
-            osc.start(); 
-            osc.stop(audioCtx.currentTime + 0.1);
+            o.start(); o.stop(audioCtx.currentTime + 0.1);
         }
 
         function playWinSound() {
-            const notes = [523.25, 659.25, 783.99, 1046.50]; 
+            // Fanfare: C G E C (Ascending) + C G E C (Descending)
+            // Faster and more energetic
+            const melody = [
+                { f: 523.25, t: 0 },    // C5
+                { f: 659.25, t: 0.1 },  // E5
+                { f: 783.99, t: 0.2 },  // G5
+                { f: 1046.50, t: 0.3 }, // C6
+                { f: 783.99, t: 0.4 },  // G5
+                { f: 1046.50, t: 0.5 }, // C6
+                { f: 1318.51, t: 0.7 }  // E6 (High ending)
+            ];
+            
             const now = audioCtx.currentTime;
             
-            notes.forEach((freq, i) => {
+            melody.forEach(note => {
                 const osc = audioCtx.createOscillator();
                 const g = audioCtx.createGain();
                 osc.connect(g); g.connect(audioCtx.destination);
                 
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.1);
-                g.gain.setValueAtTime(0.1, audioCtx.currentTime + i * 0.1);
-                g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.1 + 0.4);
+                osc.type = 'square'; // 8-bit vibe
+                osc.frequency.value = note.f;
                 
-                osc.start(audioCtx.currentTime + i * 0.1);
-                osc.stop(audioCtx.currentTime + i * 0.1 + 0.4);
+                g.gain.setValueAtTime(0, now + note.t);
+                g.gain.linearRampToValueAtTime(0.1, now + note.t + 0.05);
+                g.gain.exponentialRampToValueAtTime(0.001, now + note.t + 0.3);
+                
+                osc.start(now + note.t);
+                osc.stop(now + note.t + 0.4);
             });
-            
-            const osc2 = audioCtx.createOscillator();
-            const g2 = audioCtx.createGain();
-            osc2.connect(g2); g2.connect(audioCtx.destination);
-            osc2.type = 'sine';
-            osc2.frequency.setValueAtTime(1046.50, now + 0.3);
-            g2.gain.setValueAtTime(0, now + 0.3);
-            g2.gain.linearRampToValueAtTime(0.15, now + 0.35);
-            g2.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
-            osc2.start(now + 0.3);
-            osc2.stop(now + 1.2);
+
+            // Clap / Firework effect (Noise burst)
+            for(let i=0; i<5; i++) {
+                const osc = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                osc.connect(g); g.connect(audioCtx.destination);
+                osc.type = 'sawtooth';
+                // Random low frequencies for "boom"
+                osc.frequency.value = 100 + Math.random() * 200; 
+                
+                const start = now + 0.3 + (Math.random() * 0.5);
+                g.gain.setValueAtTime(0.1, start);
+                g.gain.exponentialRampToValueAtTime(0.001, start + 0.2);
+                
+                osc.start(start);
+                osc.stop(start + 0.2);
+            }
         }
 
-        // --- EXPORT (HARD-BAKING METHOD) ---
+        // --- CONFETTI SYSTEM ---
+        function initConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            confettiCtx = canvas.getContext('2d');
+            const resize = () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            };
+            window.addEventListener('resize', resize);
+            resize();
+        }
+
+        function fireConfetti() {
+            confettiActive = true;
+            particles = [];
+            const colors = ['#00e5ff', '#ff00ff', '#FFD700', '#ffffff', '#00ff00'];
+            
+            for(let i=0; i<200; i++) {
+                particles.push({
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                    vx: (Math.random() - 0.5) * 25,
+                    vy: (Math.random() - 0.5) * 25 - 5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    size: Math.random() * 8 + 4,
+                    life: 150,
+                    rotation: Math.random() * 360,
+                    rotationSpeed: (Math.random() - 0.5) * 10
+                });
+            }
+            requestAnimationFrame(updateConfetti);
+        }
+
+        function updateConfetti() {
+            if(!confettiActive) {
+                confettiCtx.clearRect(0,0, window.innerWidth, window.innerHeight);
+                return;
+            }
+            
+            confettiCtx.clearRect(0,0, window.innerWidth, window.innerHeight);
+            
+            let alive = false;
+            particles.forEach(p => {
+                if(p.life > 0) {
+                    alive = true;
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.4; // Gravity
+                    p.vx *= 0.96; // Air resistance
+                    p.rotation += p.rotationSpeed;
+                    p.life--;
+                    
+                    confettiCtx.save();
+                    confettiCtx.translate(p.x, p.y);
+                    confettiCtx.rotate(p.rotation * Math.PI / 180);
+                    confettiCtx.fillStyle = p.color;
+                    confettiCtx.globalAlpha = p.life / 100;
+                    confettiCtx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+                    confettiCtx.restore();
+                }
+            });
+            
+            if(alive) requestAnimationFrame(updateConfetti);
+            else confettiActive = false;
+        }
+
+        function stopConfetti() {
+            confettiActive = false;
+            if(confettiCtx) confettiCtx.clearRect(0,0, window.innerWidth, window.innerHeight);
+        }
+
+        // --- EXPORT FUNCTION ---
         function actionExportFile() {
-            // 1. Sync
             if (appData[activeClass]) {
                 appData[activeClass].current = document.getElementById('student-list').value;
             }
             saveAllStorage();
 
-            // 2. Prepare Data String
-            const dataString = JSON.stringify(appData, null, 4).replace(/<\/script>/g, "<\\/script>");
+            const dataStr = JSON.stringify(appData, null, 4).replace(/<\/script>/g, "<\\/script>");
             const activeString = activeClass.replace(/"/g, '\\"');
             
-            // 3. Create the new Replacement Block
             const newContent = `
-        let appData = ${dataString};
+        let appData = ${dataStr};
         let activeClass = "${activeString}";
         let isExported = true;
             `;
 
-            // 4. Get HTML
             let fullHTML = document.documentElement.outerHTML;
-
-            // 5. Replace the Data Block using regex
             const regex = /\/\* DATA_START \*\/[\s\S]*?\/\* DATA_END \*\//;
             
             if (regex.test(fullHTML)) {
@@ -755,18 +857,17 @@
                 return;
             }
 
-            // 6. Download
             const blob = new Blob([fullHTML], { type: 'text/html' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
             const date = new Date().toISOString().slice(0,10);
-            a.download = `RandomPicker_Data_${date}.html`;
+            a.download = `RandomPicker_Full_V7.1_${date}.html`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             
-            alertModal("Xuất file thành công! File này đã được nạp sẵn toàn bộ dữ liệu của bạn.");
+            alertModal("Xuất file thành công! File này đã được đóng gói toàn bộ danh sách lớp của bạn.");
         }
 
         // --- MODAL UTILS ---
